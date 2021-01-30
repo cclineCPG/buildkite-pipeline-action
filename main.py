@@ -31,6 +31,7 @@ class ActionContext:
     def from_env(env: Dict[str, str]) -> "ActionContext":
         with open(env["GITHUB_EVENT_PATH"], "rb") as event_file:
             event = json.load(event_file)
+            print(env["INPUT_ACCESS_TOKEN"])
             return ActionContext(
                 author=event.get("pusher", {}),
                 access_token=env["INPUT_ACCESS_TOKEN"],
@@ -98,6 +99,10 @@ def trigger_pipeline(context: ActionContext) -> dict:
         payload["pull_request_base_branch"] = context.pull_request.base_branch
         payload["pull_request_id"] = context.pull_request.number
         payload["pull_request_repository"] = context.pull_request.repository
+    print(f"🚧   {url}")
+    print(f"🚧   {context.access_token}")
+    print(f"🚧   {headers}")
+    print(f"🚧   {payload}")
     data = bytes(json.dumps(payload), encoding="utf-8")
     req = request.Request(url, method="POST", headers=headers, data=data)
     return http_send(req, context, test_response="create_build")
